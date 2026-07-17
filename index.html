@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommSkills — Communication Practice</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f6f3;
+    --surface: #ffffff;
+    --surface-2: #f2f1ee;
+    --border: #e2e0db;
+    --border-strong: #c8c5be;
+    --text: #1a1917;
+    --text-secondary: #6b6864;
+    --text-muted: #a09d99;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --accent-text: #1d4ed8;
+    --success-bg: #f0fdf4;
+    --success-text: #15803d;
+    --warning-bg: #fffbeb;
+    --warning-text: #b45309;
+    --danger-bg: #fef2f2;
+    --danger-text: #b91c1c;
+    --radius: 8px;
+    --radius-lg: 14px;
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+  .container { max-width: 700px; margin: 0 auto; }
+  header { margin-bottom: 2rem; }
+  .logo { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .tagline { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* Tabs */
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; gap: 0; }
+  .tab {
+    font-family: inherit; font-size: 14px; padding: 10px 20px;
+    border: none; background: none; color: var(--text-secondary);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all 0.15s; font-weight: 500;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Mode toggles (within practice tab) */
+  .mode-row { display: flex; gap: 8px; margin-bottom: 1.25rem; }
+  .mode-btn { font-size: 13px; padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-secondary); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1rem; }
+  .scenario-meta { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .badge { font-size: 12px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .badge-audience { background: var(--accent-light); color: var(--accent-text); }
+  .badge-type { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
+  .scenario-text { font-size: 15px; line-height: 1.65; color: var(--text); }
+  .goal-line { font-size: 13px; color: var(--text-secondary); margin-top: 10px; line-height: 1.5; }
+  .goal-line strong { color: var(--text); }
+
+  .field-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 500; }
+  .field-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: block; }
+  textarea, select, input[type=text] {
+    width: 100%; border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 10px 12px; font-size: 14px; font-family: inherit; color: var(--text);
+    background: var(--surface); outline: none; transition: border-color 0.15s; line-height: 1.6;
+  }
+  textarea { resize: vertical; }
+  textarea:focus, select:focus, input[type=text]:focus { border-color: var(--accent); }
+  .word-count { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .field-group { margin-bottom: 1rem; }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.25rem; }
+  .btn { font-family: inherit; font-size: 14px; padding: 9px 18px; border-radius: var(--radius); cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); transition: all 0.15s; }
+  .btn:hover { background: var(--surface-2); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+  .loading-overlay { display: none; text-align: center; padding: 2rem; font-size: 14px; color: var(--text-secondary); }
+  .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .feedback-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1rem; }
+  .feedback-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+  .score-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .score-pill { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 500; }
+  .good { background: var(--success-bg); color: var(--success-text); }
+  .mid { background: var(--warning-bg); color: var(--warning-text); }
+  .low { background: var(--danger-bg); color: var(--danger-text); }
+  .fb-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .fb-text { font-size: 14px; line-height: 1.7; color: var(--text); }
+  .fb-section { margin-bottom: 14px; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .rewrite-block { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; font-size: 14px; line-height: 1.7; color: var(--text); font-style: italic; }
+
+  .audio-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .audio-btn { font-family: inherit; font-size: 13px; padding: 7px 14px; border-radius: var(--radius); cursor: pointer; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-secondary); transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .audio-btn:hover { background: var(--surface-2); color: var(--text); }
+  .audio-btn.playing { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); }
+
+  .tip-box { background: var(--accent-light); border: 1px solid #bfdbfe; border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-top: 1rem; font-size: 14px; color: var(--accent-text); line-height: 1.6; }
+  .tip-label { font-size: 12px; color: var(--accent); margin-bottom: 4px; font-weight: 500; }
+
+  /* API key setup */
+  .setup-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.5rem; }
+  .setup-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .setup-card p, .setup-card li { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .setup-card ol { margin: 8px 0 12px 18px; }
+  .setup-card a { color: var(--accent); }
+  .api-input-row { display: flex; gap: 8px; }
+  .api-input-row input { flex: 1; }
+  .api-saved { font-size: 13px; color: var(--success-text); margin-top: 6px; display: none; }
+  .key-status { font-size: 12px; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+  .key-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-strong); display: inline-block; }
+  .key-dot.active { background: #15803d; }
+
+  .real-section-note { font-size: 13px; color: var(--text-secondary); background: var(--surface-2); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; line-height: 1.5; border-left: 3px solid var(--accent); }
+
+  footer { margin-top: 2.5rem; text-align: center; font-size: 12px; color: var(--text-muted); }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">Comm<span>Skills</span></div>
+    <p class="tagline">Daily communication practice for data scientists</p>
+  </header>
+
+  <!-- API Key Setup -->
+  <div class="setup-card" id="setup-card">
+    <h3>One-time setup — free Gemini API key</h3>
+    <p>No credit card needed. Takes 2 minutes:</p>
+    <ol>
+      <li>Go to <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></li>
+      <li>Sign in with your personal Google account</li>
+      <li>Click "Create API key" and copy it</li>
+      <li>Paste it below — saved only in your browser</li>
+    </ol>
+    <div class="api-input-row">
+      <input type="password" id="api-key-input" placeholder="AIza..." />
+      <button class="btn btn-primary" onclick="saveKey()">Save key</button>
+    </div>
+    <p class="api-saved" id="api-saved">✓ Key saved!</p>
+  </div>
+
+  <div class="key-status" id="key-status" style="display:none;">
+    <span class="key-dot active" id="key-dot"></span>
+    <span id="key-status-text">API key connected</span>
+    <span style="margin-left:auto;cursor:pointer;color:var(--accent);" onclick="resetKey()">Change key</span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('practice')" id="tab-practice">Practice scenarios</button>
+    <button class="tab" onclick="switchTab('real')" id="tab-real">My real situation</button>
+    <button class="tab" onclick="switchTab('tips')" id="tab-tips">Quick tips</button>
+  </div>
+
+  <!-- TAB: Practice -->
+  <div id="panel-practice">
+    <div class="mode-row">
+      <button class="mode-btn active" onclick="setMode('verbal')" id="mode-verbal">🎤 Verbal / chat</button>
+      <button class="mode-btn" onclick="setMode('email')" id="mode-email">✉️ Email</button>
+    </div>
+
+    <div class="card">
+      <div class="scenario-meta">
+        <span class="badge badge-audience" id="badge-audience"></span>
+        <span class="badge badge-type" id="badge-type"></span>
+      </div>
+      <p class="scenario-text" id="scenario-text"></p>
+      <p class="goal-line" id="goal-line"></p>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label" id="practice-response-label">Your response</label>
+      <textarea id="practice-response" rows="5" oninput="updateWordCount('practice-response','practice-wc')"></textarea>
+      <div class="word-count" id="practice-wc">0 words</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="getReview('practice')" id="practice-review-btn">Get review ↗</button>
+      <button class="btn" onclick="nextScenario()">New scenario</button>
+      <button class="btn" onclick="showTip()">Quick tip</button>
+    </div>
+
+    <div class="loading-overlay" id="practice-loading"><div class="spinner"></div><p>Reviewing your response...</p></div>
+    <div id="practice-feedback"></div>
+    <div id="practice-tip"></div>
+  </div>
+
+  <!-- TAB: Real situation -->
+  <div id="panel-real" class="hidden">
+    <div class="real-section-note">
+      Describe your actual work situation. The more specific you are, the better the feedback.
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What is the situation?</label>
+      <span class="field-hint">Who asked / what happened? Give enough context.</span>
+      <textarea id="real-situation" rows="3" placeholder="e.g. My manager asked me on a call if I have bandwidth to take on a new NLP project starting next week..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Who are you communicating with?</label>
+      <select id="real-audience">
+        <option value="Manager">Manager</option>
+        <option value="Senior leadership / Director">Senior leadership / Director</option>
+        <option value="Peer / colleague">Peer / colleague</option>
+        <option value="Business stakeholder (non-technical)">Business stakeholder (non-technical)</option>
+        <option value="New team member">New team member</option>
+        <option value="External vendor or partner">External vendor or partner</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Format</label>
+      <select id="real-format">
+        <option value="Verbal / in-person or on a call">Verbal / in-person or on a call</option>
+        <option value="Chat message (Slack/Teams)">Chat message (Slack/Teams)</option>
+        <option value="Email">Email</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What did you want to achieve?</label>
+      <span class="field-hint">Your goal in this communication.</span>
+      <textarea id="real-goal" rows="2" placeholder="e.g. Give a clear yes/no on bandwidth without over-explaining my current workload..."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">What did you actually say / write?</label>
+      <textarea id="real-response" rows="5" placeholder="Paste or type your exact response here..." oninput="updateWordCount('real-response','real-wc')"></textarea>
+      <div class="word-count" id="real-wc">0 words</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="getReview('real')" id="real-review-btn">Get review ↗</button>
+      <button class="btn" onclick="clearReal()">Clear</button>
+    </div>
+
+    <div class="loading-overlay" id="real-loading"><div class="spinner"></div><p>Reviewing your response...</p></div>
+    <div id="real-feedback"></div>
+  </div>
+
+  <!-- TAB: Tips -->
+  <div id="panel-tips" class="hidden">
+    <div class="card">
+      <p style="font-size:15px;font-weight:500;margin-bottom:1rem;">Core principles</p>
+      <div id="tips-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>CommSkills · Powered by Gemini (free) · Practice daily, communicate better</footer>
+
+<script>
+const scenarios = [
+  { audience:"Manager", type:"Status update", mode:"verbal", situation:"Your manager passes you in the hallway and asks: 'Hey, quick check — where are we on the demand forecasting model? Any blockers?'", goal:"Give a crisp, confident update. One sentence on status, one on blocker if any. No jargon.", context:"Model is 80% done, running validation this week. One blocker: waiting on clean data from the ops team." },
+  { audience:"Stakeholder", type:"Explaining a delay", mode:"email", situation:"A business stakeholder emailed asking why the chatbot accuracy report hasn't been shared yet. It was due 2 days ago.", goal:"Apologise briefly, give a clear new date, don't over-explain. Under 5 lines.", context:"Delay was due to data quality issues. New ETA: end of this week." },
+  { audience:"Peer", type:"Asking for help", mode:"verbal", situation:"You need your data engineering colleague to pull a dataset urgently. You're catching them between meetings.", goal:"Be direct and specific. State what you need, why it's urgent, and when you need it by.", context:"You need last 6 months of ScienceDirect chat logs. Urgent because model retraining is tomorrow." },
+  { audience:"Manager", type:"Raising a concern", mode:"email", situation:"You noticed the forecasting config has an uplift factor causing over-forecasting by ~20%. You need to flag this before the next planning cycle.", goal:"Flag the issue clearly, state the impact, suggest a next step. Under 4 sentences.", context:"Uplift is +35%. Data shows it should be ~15%. Recommending a config update before Friday." },
+  { audience:"New team member", type:"Onboarding explanation", mode:"verbal", situation:"A new business analyst joiner asks: 'Can you explain what RAG is? I keep hearing it in meetings.'", goal:"Explain simply in 2-3 sentences. No acronyms, no deep tech.", context:"RAG lets AI answer questions using your own documents, not just its training data." },
+  { audience:"Manager", type:"Bandwidth check", mode:"verbal", situation:"Your manager calls and asks: 'I have a new NLP project coming in next week. Do you have bandwidth to take it on?'", goal:"Give a clear yes/no, state your current load briefly, flag any caveat.", context:"You have ~1.5 days free per week. Current projects wrap in 2 weeks. Can start light immediately." },
+  { audience:"Stakeholder", type:"Presenting a result", mode:"email", situation:"You ran a pilot model for email demand forecasting. Accuracy came out at 95%. Share this result with the business team.", goal:"Lead with the number, explain what it means for them, suggest a next step.", context:"95% accuracy on CSS Email. Forecasting can now be automated. Next step: sign-off to go live." },
+  { audience:"Manager", type:"Proposing an idea", mode:"email", situation:"You want to propose automating a manual weekly reporting task that currently takes 3 hours. You need your manager's buy-in.", goal:"State the problem, the solution, and the benefit. Under 4 sentences.", context:"Manual report takes 3 hrs/week. You can automate it in ~2 days of work. Saves ~12 hrs/month." },
+  { audience:"Peer", type:"Disagreeing politely", mode:"verbal", situation:"In a team meeting, your colleague suggests using a rule-based system for a task you believe needs an ML model.", goal:"Push back respectfully. State your view, give one reason, leave room for discussion.", context:"Rule-based won't generalise to edge cases. ML handles variance better given the data volume." },
+  { audience:"Stakeholder", type:"Setting expectations", mode:"verbal", situation:"A stakeholder asks if the new recommendation model can go live next week. It won't be ready for at least 3 weeks.", goal:"Be honest about the timeline without over-explaining. Give the date and one reason.", context:"3 weeks needed for validation and safety checks before deployment." }
+];
+
+const allTips = [
+  { principle: "BLUF", detail: "Bottom Line Up Front. Lead with your conclusion, then support it. Never bury the answer." },
+  { principle: "Switch hats", detail: "Manager = business impact. Peer = method and trade-offs. Stakeholder = outcome in their language. New joiner = plain English." },
+  { principle: "The 10-second rule", detail: "Before speaking, ask: what's the one thing they need to walk away with? Say that first." },
+  { principle: "Offer depth, don't default to it", detail: "Say your key point, then stop. Add: 'Want more detail?' Most people say no — and that tells you something." },
+  { principle: "What + why + by when", detail: "For any request or update: state what you need, why it matters, and the deadline. In that order. Every time." },
+  { principle: "No jargon for non-technical people", detail: "If you reach for an acronym or technical term with a business audience, stop and restart the sentence." },
+  { principle: "Shorter is harder", detail: "Anyone can talk for 5 minutes. It takes effort to say it in 30 seconds. Put the effort in before you speak." },
+  { principle: "Silence is not a gap to fill", detail: "After your key point, pause. Let them respond. Filling silence with more explanation often muddies the message." },
+  { principle: "Problem before solution", detail: "When flagging an issue, name the impact first ('this is causing X'), then the cause, then your suggestion." },
+  { principle: "One caveat, not three", detail: "If you have multiple caveats, pick the most important one. State that. The rest can come if they ask." }
+];
+
+let currentScenario = null;
+let currentMode = 'verbal';
+let lastFeedback = {};
+
+// --- Setup ---
+function saveKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) { alert('Paste your API key first.'); return; }
+  localStorage.setItem('commskills_gemini_key', key);
+  document.getElementById('api-saved').style.display = 'block';
+  document.getElementById('api-key-input').value = '••••••••••••••••';
+  setTimeout(updateKeyUI, 1200);
+}
+
+function resetKey() {
+  localStorage.removeItem('commskills_gemini_key');
+  updateKeyUI();
+}
+
+function updateKeyUI() {
+  const hasKey = !!localStorage.getItem('commskills_gemini_key');
+  document.getElementById('setup-card').style.display = hasKey ? 'none' : 'block';
+  document.getElementById('key-status').style.display = hasKey ? 'flex' : 'none';
+}
+
+window.onload = function() {
+  updateKeyUI();
+  nextScenario();
+  renderTips();
+};
+
+// --- Tabs ---
+function switchTab(tab) {
+  ['practice','real','tips'].forEach(t => {
+    document.getElementById('panel-' + t).classList.toggle('hidden', t !== tab);
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+  });
+}
+
+// --- Practice tab ---
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-verbal').classList.toggle('active', mode === 'verbal');
+  document.getElementById('mode-email').classList.toggle('active', mode === 'email');
+  nextScenario();
+}
+
+function nextScenario() {
+  const filtered = scenarios.filter(s => s.mode === currentMode);
+  currentScenario = filtered[Math.floor(Math.random() * filtered.length)];
+  document.getElementById('badge-audience').textContent = currentScenario.audience;
+  document.getElementById('badge-type').textContent = currentScenario.type;
+  document.getElementById('scenario-text').textContent = currentScenario.situation;
+  document.getElementById('goal-line').innerHTML = '<strong>Your goal:</strong> ' + currentScenario.goal;
+  document.getElementById('practice-response').value = '';
+  document.getElementById('practice-wc').textContent = '0 words';
+  document.getElementById('practice-response-label').textContent = currentMode === 'email' ? 'Your email response' : 'Your verbal / chat response';
+  document.getElementById('practice-response').placeholder = currentMode === 'email' ? 'Write your email here...' : 'Type what you would say...';
+  document.getElementById('practice-feedback').innerHTML = '';
+  document.getElementById('practice-tip').innerHTML = '';
+  document.getElementById('practice-loading').style.display = 'none';
+  speechSynthesis.cancel();
+}
+
+function updateWordCount(textareaId, wcId) {
+  const text = document.getElementById(textareaId).value.trim();
+  const count = text ? text.split(/\s+/).length : 0;
+  document.getElementById(wcId).textContent = count + ' word' + (count !== 1 ? 's' : '');
+}
+
+function clearReal() {
+  ['real-situation','real-goal','real-response'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('real-wc').textContent = '0 words';
+  document.getElementById('real-feedback').innerHTML = '';
+}
+
+// --- Review ---
+async function getReview(mode) {
+  const apiKey = localStorage.getItem('commskills_gemini_key');
+  if (!apiKey) { alert('Add your Gemini API key first.'); document.getElementById('setup-card').style.display = 'block'; return; }
+
+  let situation, audience, format, goal, userText;
+
+  if (mode === 'practice') {
+    userText = document.getElementById('practice-response').value.trim();
+    if (!userText) { alert('Write your response first!'); return; }
+    situation = currentScenario.situation;
+    audience = currentScenario.audience;
+    format = currentMode === 'email' ? 'Email' : 'Verbal/chat';
+    goal = currentScenario.goal;
+  } else {
+    situation = document.getElementById('real-situation').value.trim();
+    audience = document.getElementById('real-audience').value;
+    format = document.getElementById('real-format').value;
+    goal = document.getElementById('real-goal').value.trim();
+    userText = document.getElementById('real-response').value.trim();
+    if (!situation || !userText) { alert('Fill in the situation and your response at minimum.'); return; }
+    if (!goal) goal = 'Communicate clearly and appropriately for the audience.';
+  }
+
+  const btnId = mode === 'practice' ? 'practice-review-btn' : 'real-review-btn';
+  const loadingId = mode === 'practice' ? 'practice-loading' : 'real-loading';
+  const feedbackId = mode === 'practice' ? 'practice-feedback' : 'real-feedback';
+
+  document.getElementById(btnId).disabled = true;
+  document.getElementById(loadingId).style.display = 'block';
+  document.getElementById(feedbackId).innerHTML = '';
+  speechSynthesis.cancel();
+
+  const prompt = `You are a sharp, direct communication coach helping a data scientist improve workplace communication. Your feedback is specific, honest, and actionable — never generic.
+
+SITUATION: ${situation}
+AUDIENCE: ${audience}
+FORMAT: ${format}
+GOAL: ${goal}
+
+THEIR RESPONSE:
+"${userText}"
+
+Reply ONLY with a valid JSON object. No markdown, no code fences, no text before or after:
+{"clarity":"Good|Fair|Needs work","length":"Good|Too long|Too short","audience_fit":"Good|Fair|Needs work","summary":"One honest sentence on overall quality","what_worked":"One specific thing done well","improve":"One specific actionable improvement","rewrite":"Concise rewritten version — 2-3 sentences for verbal/chat, 5-6 lines for email","coaching_note":"One memorable principle to take away from this exercise"}`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.4, maxOutputTokens: 1024 }
+        })
+      }
+    );
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error?.message || 'API error ' + res.status); }
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const fb = JSON.parse(clean.slice(clean.indexOf('{'), clean.lastIndexOf('}') + 1));
+    lastFeedback[mode] = fb;
+    renderFeedback(fb, feedbackId, format.toLowerCase().includes('verbal') || format.toLowerCase().includes('chat'), mode);
+  } catch(e) {
+    document.getElementById(feedbackId).innerHTML = `<div class="feedback-card"><p style="color:#b91c1c;font-size:14px;line-height:1.6;">Error: ${e.message}<br><br>Check your API key or internet connection.</p></div>`;
+  }
+
+  document.getElementById(btnId).disabled = false;
+  document.getElementById(loadingId).style.display = 'none';
+}
+
+function scoreClass(v) {
+  return v === 'Good' ? 'good' : (v === 'Fair' || v === 'Too short') ? 'mid' : 'low';
+}
+
+function renderFeedback(fb, containerId, isVerbal, mode) {
+  document.getElementById(containerId).innerHTML = `
+    <div class="feedback-card">
+      <p class="feedback-title">Your feedback</p>
+      <div class="score-row">
+        <span class="score-pill ${scoreClass(fb.clarity)}">Clarity: ${fb.clarity}</span>
+        <span class="score-pill ${scoreClass(fb.length)}">Length: ${fb.length}</span>
+        <span class="score-pill ${scoreClass(fb.audience_fit)}">Audience fit: ${fb.audience_fit}</span>
+      </div>
+      <p class="fb-text">${fb.summary}</p>
+      <div class="divider"></div>
+      <div class="fb-section">
+        <p class="fb-label">What worked</p>
+        <p class="fb-text">✓ ${fb.what_worked}</p>
+      </div>
+      <div class="fb-section" style="margin-top:10px;">
+        <p class="fb-label">One thing to improve</p>
+        <p class="fb-text">→ ${fb.improve}</p>
+      </div>
+      <div class="divider"></div>
+      <div class="fb-section">
+        <p class="fb-label">Suggested rewrite</p>
+        <div class="rewrite-block" id="rewrite-${mode}">${fb.rewrite}</div>
+        ${isVerbal ? `<div class="audio-row">
+          <button class="audio-btn" onclick="speak('${mode}','summary')">🔊 Read feedback</button>
+          <button class="audio-btn" onclick="speak('${mode}','rewrite')">🔊 Read rewrite</button>
+          <button class="audio-btn" onclick="speechSynthesis.cancel()" style="display:inline-flex;">⏹ Stop</button>
+        </div>` : ''}
+      </div>
+      <div class="divider"></div>
+      <div class="fb-section">
+        <p class="fb-label">Take away</p>
+        <p class="fb-text" style="color:var(--accent-text);">💡 ${fb.coaching_note}</p>
+      </div>
+    </div>
+    ${mode === 'practice' ? '<div style="margin-top:12px;"><button class="btn" onclick="nextScenario()">Try another scenario</button></div>' : ''}`;
+}
+
+function speak(mode, part) {
+  speechSynthesis.cancel();
+  const fb = lastFeedback[mode];
+  if (!fb) return;
+  const text = part === 'summary'
+    ? `Here is your feedback. ${fb.summary}. What worked: ${fb.what_worked}. One thing to improve: ${fb.improve}. Take away: ${fb.coaching_note}`
+    : `Here is the suggested rewrite. ${fb.rewrite}`;
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.rate = 0.92; utt.lang = 'en-US';
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(v => v.name.includes('Samantha') || v.name.includes('Google US English') || v.name.includes('Daniel'));
+  if (v) utt.voice = v;
+  speechSynthesis.speak(utt);
+}
+
+function showTip() {
+  const tips = allTips.map(t => t.detail);
+  const tip = tips[Math.floor(Math.random() * tips.length)];
+  document.getElementById('practice-tip').innerHTML = `<div class="tip-box"><p class="tip-label">Quick tip</p>${tip}</div>`;
+}
+
+function renderTips() {
+  document.getElementById('tips-list').innerHTML = allTips.map(t => `
+    <div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+      <p style="font-size:14px;font-weight:500;margin-bottom:4px;">${t.principle}</p>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">${t.detail}</p>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
